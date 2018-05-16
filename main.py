@@ -59,6 +59,7 @@ def upsampling_layer(input, filters, kernel_size, strides):
                                       kernel_size,
                                       strides,
                                       padding='same',
+                                      activation=None, 
                                       kernel_initializer=tf.truncated_normal_initializer(stddev=0.01),
                                       kernel_regularizer=tf.contrib.layers.l2_regularizer(1e-3))
 
@@ -68,16 +69,9 @@ def convolution_layer(input, num_output):
                                   kernel_size=(1, 1),
                                   strides=(1, 1),
                                   padding='same',
-                                  activation=None,  # TODO: test different activations
+                                  activation=None, 
                                   kernel_initializer=tf.truncated_normal_initializer(stddev=0.01),
-                                  kernel_regularizer=tf.contrib.layers.l2_regularizer(0.01))
-
-
-
-
-
-
-
+                                  kernel_regularizer=tf.contrib.layers.l2_regularizer(1e-3))
 
 
 def layers(vgg_layer3_out, vgg_layer4_out, vgg_layer7_out, num_classes):
@@ -152,15 +146,15 @@ def train_nn(sess, epochs, batch_size, get_batches_fn, train_op, cross_entropy_l
 
     print("Training...")
     print()
-    for i in range(epochs):
-        print("EPOCH {} ...".format(i + 1))
+    for i in range(epochs):        
+        j = 0
         for image, label in get_batches_fn(batch_size):
             _, loss = sess.run([train_op, cross_entropy_loss],
                                feed_dict={input_image: image, correct_label: label, keep_prob: 0.5,
-                                          learning_rate: 0.0005})
+                                          learning_rate: 0.001})
 
-            if i%10 == 0:
-                print("Loss: = {:.3f}".format(loss))
+            print("EPOCH {} ... BATCH {} ... Loss: = {:.3f}".format(i + 1, j + 1, loss))
+            j += 1
 
 
     print()
@@ -184,12 +178,9 @@ def run():
     # You'll need a GPU with at least 10 teraFLOPS to train on.
     #  https://www.cityscapes-dataset.com/
 
-
-    epochs = 2
-
-    batch_size = 1
-    keep = tf.constant(0.5, dtype=tf.float32)
-    learning_rate = tf.constant(0.0005, dtype=tf.float32)
+    epochs = 60
+    batch_size = 5
+    learning_rate = tf.placeholder(tf.float32, name='learning_rate')
 
     with tf.Session() as sess:
         sess.run(tf.global_variables_initializer())
@@ -201,7 +192,7 @@ def run():
         get_batches_fn = helper.gen_batch_function(os.path.join(data_dir, 'data_road/training'), image_shape)
 
         # OPTIONAL: Augment Images for better results
-        #  https://datascience.stackexchange.com/questions/5224/how-to-prepare-augment-images-for-neural-network
+        # https://datascience.stackexchange.com/questions/5224/how-to-prepare-augment-images-for-neural-network
 
         correct_label = tf.placeholder(tf.int32, [None, None, None, num_classes], name='correct_label')
 
@@ -217,7 +208,6 @@ def run():
                  correct_label, keep_prob ,learning_rate)
 
         # TODO: Save inference data using helper.save_inference_samples
-        #  helper.save_inference_samples(runs_dir, data_dir, sess, image_shape, logits, keep_prob, input_image)
         helper.save_inference_samples(runs_dir, data_dir, sess, image_shape, logits, keep_prob, input_image)
 
         # OPTIONAL: Apply the trained model to a video
@@ -225,3 +215,4 @@ def run():
 
 if __name__ == '__main__':
     run()
+
