@@ -150,8 +150,17 @@ def train_nn(sess, epochs, batch_size, get_batches_fn, train_op, cross_entropy_l
         j = 0
         for image, label in get_batches_fn(batch_size):
             _, loss = sess.run([train_op, cross_entropy_loss],
-                               feed_dict={input_image: image, correct_label: label, keep_prob: 0.5,
-                                          learning_rate: 0.001})
+                               feed_dict={input_image: image, correct_label: label, keep_prob: 0.35,
+                                          learning_rate: 0.0008})
+#             if loss < 0.200:
+#               lr = 0.0005
+#             if loss < 0.100:
+#               lr = 0.0001
+#             if loss < 0.050:
+#               lr = 0.00005
+#             if loss < 0.020:
+#               lr = 0.00001
+            
 
             print("EPOCH {} ... BATCH {} ... Loss: = {:.3f}".format(i + 1, j + 1, loss))
             j += 1
@@ -178,13 +187,14 @@ def run():
     # You'll need a GPU with at least 10 teraFLOPS to train on.
     #  https://www.cityscapes-dataset.com/
 
-    epochs = 60
-    batch_size = 5
-    learning_rate = tf.placeholder(tf.float32, name='learning_rate')
+
 
     with tf.Session() as sess:
         sess.run(tf.global_variables_initializer())
 
+        epochs = 12
+        batch_size = 17
+        learning_rate = tf.placeholder(tf.float32, name='learning_rate')
 
         # Path to vgg model
         vgg_path = os.path.join(data_dir, 'vgg')
