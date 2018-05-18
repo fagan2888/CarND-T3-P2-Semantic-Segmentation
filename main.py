@@ -150,24 +150,12 @@ def train_nn(sess, epochs, batch_size, get_batches_fn, train_op, cross_entropy_l
         j = 0
         for image, label in get_batches_fn(batch_size):
             _, loss = sess.run([train_op, cross_entropy_loss],
-                               feed_dict={input_image: image, correct_label: label, keep_prob: 0.35,
-                                          learning_rate: 0.0008})
-#             if loss < 0.200:
-#               lr = 0.0005
-#             if loss < 0.100:
-#               lr = 0.0001
-#             if loss < 0.050:
-#               lr = 0.00005
-#             if loss < 0.020:
-#               lr = 0.00001
-            
+                               feed_dict={input_image: image, correct_label: label, keep_prob: 0.45,
+                                          learning_rate: 0.001})            
 
-            print("EPOCH {} ... BATCH {} ... Loss: = {:.3f}".format(i + 1, j + 1, loss))
+            print("EPOCH {} ... BATCH {} ... LOSS: = {:.3f}".format(i + 1, j + 1, loss))
             j += 1
-
-
     print()
-    pass
 
 
 tests.test_train_nn(train_nn)
@@ -224,5 +212,14 @@ def run():
 
 
 if __name__ == '__main__':
+  
+#     from urllib.request import urlretrieve
+#     from zipfile import ZipFile
+#     import os
+    
+#     urlretrieve("https://s3-us-west-1.amazonaws.com/udacity-selfdrivingcar/advanced_deep_learning/data_road.zip","./data/data_road.zip")
+#     with ZipFile("./data/data_road.zip") as zipf:
+#         zipf.extractall("./data/")
+        
     run()
 
